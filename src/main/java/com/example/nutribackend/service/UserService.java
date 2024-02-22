@@ -1,18 +1,16 @@
 package com.example.nutribackend.service;
 
 
-import com.example.nutribackend.model.User;
+import com.example.nutribackend.domain.User;
+import com.example.nutribackend.domain.dto.UserDTO;
+import com.example.nutribackend.domain.dto.UserWithoutPassDTO;
 
 import java.util.List;
 
 public interface UserService {
-    User saveUser(User user);
+    boolean authorizeUser(String email, String password);
 
-    List<User> getAllUsers();
+    UserWithoutPassDTO getUserByEmail(String email);
 
-    User getUserById(Long id);
-
-    boolean deleteUser(Long id);
-
-    User updateUser(Long id, User user);
+    UserWithoutPassDTO registerUser(UserDTO user);
 }

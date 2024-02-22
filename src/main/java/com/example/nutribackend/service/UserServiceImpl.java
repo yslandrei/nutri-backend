@@ -1,49 +1,49 @@
 package com.example.nutribackend.service;
 
-import com.example.nutribackend.model.User;
+import com.example.nutribackend.domain.User;
+import com.example.nutribackend.domain.dto.UserDTO;
+import com.example.nutribackend.domain.dto.UserWithoutPassDTO;
 import com.example.nutribackend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public User saveUser(User user) {
-        userRepository.save(user);
-        return user;
+    public boolean authorizeUser(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        return user != null && bCryptPasswordEncoder.matches(password, user.getPassword());
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public UserWithoutPassDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        return new UserWithoutPassDTO(user.getId(), user.getName(), user.getEmail());
     }
 
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).get();
+    public UserWithoutPassDTO registerUser(UserDTO user) {
+        if (userRepository.findByEmail(user.email()) != null) {
+            return null;
+        }
+        User newUser = new User(null, user.name(), user.email(), bCryptPasswordEncoder.encode(user.password()));
+        newUser = userRepository.save(newUser);
+        return new UserWithoutPassDTO(newUser.getId(), newUser.getName(), newUser.getEmail());
     }
 
-    @Override
-    public boolean deleteUser(Long id) {
-        User user =  userRepository.findById(id).get();
-        userRepository.delete(user);
-        return true;
-    }
-
-    @Override
-    public User updateUser(Long id, User user) {
-        User existingUser = userRepository.findById(id).get();
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-        userRepository.save(existingUser);
-        return user;
-    }
 }
