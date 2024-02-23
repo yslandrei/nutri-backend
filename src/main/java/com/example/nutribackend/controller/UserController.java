@@ -1,6 +1,8 @@
 package com.example.nutribackend.controller;
 
+import com.example.nutribackend.domain.UserAllergens;
 import com.example.nutribackend.domain.dto.AuthRequestDTO;
+import com.example.nutribackend.domain.dto.UserAllergensDTO;
 import com.example.nutribackend.domain.dto.UserDTO;
 import com.example.nutribackend.domain.dto.UserWithoutPassDTO;
 import com.example.nutribackend.service.UserService;
@@ -15,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/user/")
 public class UserController {
 
     private final UserService userService;
@@ -29,17 +31,26 @@ public class UserController {
         if (userService.authorizeUser(request.email(), request.password())) {
             return ResponseEntity.ok(userService.getUserByEmail(request.email()));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserWithoutPassDTO> register(@RequestBody UserDTO user) {
-        UserWithoutPassDTO userWithoutPass = userService.registerUser(user);
-        if (userWithoutPass != null) {
-            return ResponseEntity.ok(userWithoutPass);
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        return ResponseEntity.ok(userService.registerUser(user));
+    }
+
+    @GetMapping("/allergens")
+    public ResponseEntity<UserAllergensDTO> getAllergens(@RequestParam String userId) {
+        UserAllergensDTO userAllergensDTO = userService.getAllergensOfUser(userId);
+        if (userAllergensDTO == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
+        return ResponseEntity.ok(userAllergensDTO);
+    }
+
+    @PatchMapping("/allergens")
+    public ResponseEntity<Void> updateAllergens(@RequestParam String userId, @RequestBody UserAllergensDTO allergens) {
+        return ResponseEntity.ok(userService.updateAllergensOfUser(userId, allergens));
     }
 }
