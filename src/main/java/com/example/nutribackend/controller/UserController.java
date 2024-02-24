@@ -1,19 +1,10 @@
 package com.example.nutribackend.controller;
 
-import com.example.nutribackend.domain.UserAllergens;
-import com.example.nutribackend.domain.dto.AuthRequestDTO;
-import com.example.nutribackend.domain.dto.UserAllergensDTO;
-import com.example.nutribackend.domain.dto.UserDTO;
-import com.example.nutribackend.domain.dto.UserWithoutPassDTO;
+import com.example.nutribackend.domain.dto.*;
 import com.example.nutribackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.nutribackend.domain.User;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -52,5 +43,22 @@ public class UserController {
     @PatchMapping("/allergens")
     public ResponseEntity<Void> updateAllergens(@RequestParam String userId, @RequestBody UserAllergensDTO allergens) {
         return ResponseEntity.ok(userService.updateAllergensOfUser(userId, allergens));
+    }
+
+    @PutMapping("/settings/profile/{userId}")
+    public ResponseEntity<Void> updateUserProfile(@PathVariable String userId, @RequestBody UserProfileDTO user) {
+        userService.updateUserProfile(userId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/find/{userId}")
+    public ResponseEntity<UserProfileDTO> findUser(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.findUser(userId));
+    }
+
+    @PostMapping("/settings/profile/{userId}/updatePassword")
+    public ResponseEntity<Void> updatePassword(@PathVariable String userId, @RequestBody UserUpdatePasswordDTO data) {
+        userService.updateUserPassword(userId, data);
+        return ResponseEntity.ok().build();
     }
 }
