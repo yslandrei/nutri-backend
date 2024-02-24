@@ -1,7 +1,6 @@
 package com.example.nutribackend.service;
 
 
-import com.example.nutribackend.domain.User;
 import com.example.nutribackend.domain.dto.*;
 
 public interface UserService {

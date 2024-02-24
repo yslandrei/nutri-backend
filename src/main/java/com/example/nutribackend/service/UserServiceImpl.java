@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDTO findUser(String userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));;
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         return new UserProfileDTO(user.getName(), user.getEmail());
     }
 
