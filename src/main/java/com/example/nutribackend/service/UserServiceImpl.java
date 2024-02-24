@@ -2,15 +2,15 @@ package com.example.nutribackend.service;
 
 import com.example.nutribackend.domain.User;
 import com.example.nutribackend.domain.UserAllergens;
-import com.example.nutribackend.domain.dto.UserAllergensDTO;
-import com.example.nutribackend.domain.dto.UserDTO;
-import com.example.nutribackend.domain.dto.UserWithoutPassDTO;
+import com.example.nutribackend.domain.dto.*;
 import com.example.nutribackend.domain.exception.ResourceAlreadyExistsException;
 import com.example.nutribackend.domain.exception.ResourceNotFoundException;
 import com.example.nutribackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 
 @Service
@@ -70,5 +70,34 @@ public class UserServiceImpl implements UserService {
         user.setAllergens(userAllergens);
         userRepository.save(user);
         return null;
+    }
+
+    @Override
+    public void updateUserProfile(String userId, UserProfileDTO data) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        user.setEmail(data.email());
+        user.setName(data.name());
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserProfileDTO findUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));;
+        return new UserProfileDTO(user.getName(), user.getEmail());
+    }
+
+    @Override
+    public void updateUserPassword(String userId, UserUpdatePasswordDTO data) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        if (!Objects.equals(data.oldPassword(), data.confirmedOldPassword())) {
+            throw new ResourceNotFoundException("Passwords do not match!");
+        }
+        if (!bCryptPasswordEncoder.matches(data.oldPassword(), user.getPassword())) {
+            throw new ResourceNotFoundException("Passwords do not match!");
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(data.newPassword()));
     }
 }
