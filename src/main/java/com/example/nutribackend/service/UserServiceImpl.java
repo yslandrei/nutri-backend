@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
             throw new ResourceAlreadyExistsException("User with email " + foundUser.getEmail() + " already exists");
         });
 
-        User newUser = new User(null, user.name(), user.email(), bCryptPasswordEncoder.encode(user.password()));
+        User newUser = new User(null, user.name(), user.email(), LocalDateTime.now(), bCryptPasswordEncoder.encode(user.password()), null);
         newUser = userRepository.save(newUser);
         return new UserWithoutPassDTO(newUser.getId(), newUser.getName(), newUser.getEmail());
     }

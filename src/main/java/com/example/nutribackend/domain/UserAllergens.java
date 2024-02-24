@@ -87,7 +87,7 @@ public class UserAllergens {
 
     public void setUser(User user) {
         this.user = user;
-    }
+        }
 
     public AllergenImportance getGluten() {
         return gluten;

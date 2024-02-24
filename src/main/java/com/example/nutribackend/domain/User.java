@@ -2,6 +2,8 @@ package com.example.nutribackend.domain;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "users")
@@ -14,16 +16,28 @@ public class User {
 
     private String email;
 
+    private LocalDateTime emailVerified;
+
     private String password;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserAllergens allergens;
 
-    public User(String id, String name, String email, String password) {
+    public User(String id, String name, String email, LocalDateTime emailVerified, String password, UserAllergens allergens) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.emailVerified = emailVerified;
         this.password = password;
+        this.allergens = allergens;
+    }
+
+    public LocalDateTime getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(LocalDateTime emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public User() {
